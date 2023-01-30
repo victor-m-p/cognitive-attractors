@@ -1,14 +1,10 @@
 ## Overview
 
-Pre-review code for "Inferring Cultural Landscapes with the Inverse Ising Model"
+Code for "Cognitive Attractors in the Cultural Evolution of Religion".
 
 Victor Møller Poulsen and Simon DeDeo
 
-submitted to *Entropy*, 9 December 2022
-
-This is *pre-review* code, not intended for general public circulation. We would be very grateful for comments, questions, and thoughts.
-
-We are very happy to take requests. Our experience has been that iterating with potential users is the best way to make our code and data clear, reusable, and efficient to use. On re-submission and review, we will release general code, intended for consumer use, and a full guide.
+Submitted to *COGSCI*, 1 February 2023.
 
 ## Components
 
