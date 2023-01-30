@@ -74,7 +74,7 @@ x, y = pos[1]
 pos[1] = (x+15, y)
 
 # make a new network
-focus_list = [12, 13]
+focus_list = [11, 12, 13]
 d_edgelst = d_edgelst[(d_edgelst['n1'].isin(focus_list)) | (d_edgelst['n2'].isin(focus_list))]
 
 G, labeldict = create_graph(d_edgelst, dct_nodes)
