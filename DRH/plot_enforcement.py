@@ -66,6 +66,17 @@ plt.plot(lower_line['n_fixed_traits'].values,
          ls = '--'
          )
 plt.plot(n_fixed_traits, median_remain, color = '#152238', linewidth = 2)
+# labels
+plt.annotate('Ancient Egypt', 
+             (0, 92), 
+             color = '#152238', 
+             size = 15,
+             rotation = 30)
+plt.annotate('Santal', 
+             (6, 84), 
+             color = '#152238', 
+             size = 15,
+             rotation = 53)
 plt.xticks(np.arange(0, 20, 1))
 plt.xlabel('Number of traits fixed', size = small_text)
 plt.ylabel(r'$\mathrm{P_{remain}}$', size = small_text)
