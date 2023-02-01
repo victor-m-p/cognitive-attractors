@@ -75,6 +75,8 @@ unique_config_df = pd.DataFrame({'config_id': config_uniq})
 node_attributes = unique_config_df.merge(entry_maxlikelihood, on = 'config_id', how = 'left').fillna("")
 node_attributes.sort_values('config_id')
 
+node_attributes
+
 # decide on specific labels to include 
 entry_names = [(362246, 'Valentinians'),
                (362374, "Jehovah's Witnesses"), # Pauline Christianity, Churches of Christ, Gaengjeongyudo, Monatism, Branch Davidians, Mennonites, Circumcellions, Christianity Ephesus, Jehovah, Egyptian Salafism

@@ -1,3 +1,7 @@
+'''
+julia implementation used instead.
+'''
+
 # COGSCI23
 import pandas as pd 
 import numpy as np 
@@ -58,6 +62,3 @@ for t in range(max_timestep):
         break 
     else: 
         focal_idx_list = neighbor_idx_total 
-
-sample_list
-
