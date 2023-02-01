@@ -67,33 +67,9 @@ plt.plot(lower_line['n_fixed_traits'].values,
          )
 plt.plot(n_fixed_traits, median_remain, color = '#152238', linewidth = 2)
 plt.xticks(np.arange(0, 20, 1))
-plt.xlabel('Number of fixed traits', size = small_text)
-plt.ylabel('P(remain)', size = small_text)
-ax.legend(bbox_to_anchor=(0.9, -0.2))
+plt.xlabel('Number of traits fixed', size = small_text)
+plt.ylabel(r'$\mathrm{P_{remain}}$', size = small_text)
 plt.savefig('../fig/enforcement/enforcement_hdi.pdf', bbox_inches = 'tight')
 
-# lines plot 
-fig, ax = plt.subplots(figsize = (7, 5), dpi = 300)
-sns.lineplot(
-    x = 'n_fixed_traits',
-    y = 'prob_remain',
-    estimator = None, 
-    lw = 1,
-    alpha = 0.20,
-    data = d_enforcement,
-    units = 'config_id'
-)
-plt.plot(upper_line['n_fixed_traits'].values,
-         upper_line['prob_remain'].values, 
-         color = '#152238',
-         ls = '--')
-plt.plot(lower_line['n_fixed_traits'].values, 
-         lower_line['prob_remain'].values, 
-         color = '#152238',
-         ls = '--'
-         )
-plt.plot(n_fixed_traits, median_remain, color = '#152238', linewidth = 2)
-plt.xticks(np.arange(0, 20, 1))
-plt.xlabel('Number of fixed traits', size = small_text)
-plt.ylabel('P(remain)', size = small_text)
-plt.savefig('../fig/enforcement/enforcement_lines.pdf')
+## what are the medians and HDI for different values?
+hdi_df['median'] = median_remain

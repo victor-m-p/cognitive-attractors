@@ -78,13 +78,13 @@ entries = pd.DataFrame({
                   929282, 978831, 995207,
                   #1016839
                   ],
-    'entry_short': ['Pauline', #'Marcionites'
+    'entry_short': ["Jehovah's Witnesses", #'Marcionites'
                     'Muslim Students US/CA',
-                    'Yolngu', 'Donatism', #'Soviet Atheism',
+                    'Yolngu religion', 'Donatism', #'Soviet Atheism',
                     #'Santal', 
                     'Aztec', 'Pagans under Julian',
                     #'Circumcellions', 
-                    'Iban', 'Rwala Bedouin',
+                    'Iban religion', 'Rwala Bedouin',
                     'Sadducees', 'Tang Tantrism', 'Samaritans',
                     #'Muridiyya Senegal'
                     ]})
@@ -122,7 +122,7 @@ sns.regplot(data = stability,
 ## the annotations 
 plt.axvline(x = median_config,
            ymin = 0,
-           ymax = 1,
+           ymax = 0.92,
            ls = '--',
            color = 'tab:red')
 for _, row in annotations.iterrows(): 
@@ -131,10 +131,10 @@ for _, row in annotations.iterrows():
     label = row['entry_short']
     # specifics 
     if label == 'Samaritans': 
-        ax.annotate(label, xy = (x-0.1, y+0.01),
+        ax.annotate(label, xy = (x-0.1, y+0.006),
                     horizontalalignment = 'right',
                     verticalalignment = 'center')
-    elif label in ['Pauline', 'Astec', 
+    elif label in ["Jehovah's Witnesses", 'Astec', 
                  'Muslim Students US/CA', 'Muridiyya Senegal',
                  'Tang Tantrism', 'Soviet Atheism']: 
         ax.annotate(label, xy = (x-0.1, y),
@@ -144,8 +144,8 @@ for _, row in annotations.iterrows():
         ax.annotate(label, xy = (x+0.1, y),
                     horizontalalignment = 'left',
                     verticalalignment = 'center')
-plt.xlabel('Log(P(configuration))', size = small_text)
-plt.ylabel('P(remain)', size = small_text)
+plt.xlabel(r'$\mathrm{log} \; \mathrm{P(i)}$', size = small_text)
+plt.ylabel(r'$\mathrm{P_{remain}}$', size = small_text)
 plt.xlim(-14, -3.6)
 ## save figure 
 plt.savefig('../fig/stability.pdf')

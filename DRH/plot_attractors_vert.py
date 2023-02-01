@@ -1,5 +1,6 @@
 '''
 VMP 2022-01-30: this is the one we actually use. 
+this really needs a cleanup
 '''
 
 import networkx as nx             # graph manipulation
@@ -53,7 +54,6 @@ for file in tqdm(files):
         config_probs['log_config_prob'] = [np.log(x) for x in config_probs['config_prob']]
 
         ## node size by hamming? ## 
-        configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
         n_nodes = 20
         configurations = bin_states(n_nodes) 
         ConfOrig = cn.Configuration(config_orig,
