@@ -56,10 +56,10 @@ hdi_50_u = hdi_df['hdi_50_u'].tolist()
 fig, ax = plt.subplots(figsize = (7, 5), dpi = 300)
 plt.fill_between(n_fixed_traits, hdi_95_l, hdi_95_u, color = 'tab:blue', alpha = 0.3)
 plt.fill_between(n_fixed_traits, hdi_50_l, hdi_50_u, color = 'tab:blue', alpha = 0.5)
-plt.plot(upper_line['n_fixed_traits'].values,
-         upper_line['prob_remain'].values, 
-         color = '#152238',
-         ls = '--')
+#plt.plot(upper_line['n_fixed_traits'].values,
+#         upper_line['prob_remain'].values, 
+#         color = '#152238',
+#         ls = '--')
 plt.plot(lower_line['n_fixed_traits'].values, 
          lower_line['prob_remain'].values, 
          color = '#152238',
@@ -67,16 +67,18 @@ plt.plot(lower_line['n_fixed_traits'].values,
          )
 plt.plot(n_fixed_traits, median_remain, color = '#152238', linewidth = 2)
 # labels
-plt.annotate('Ancient Egypt', 
-             (0, 92), 
-             color = '#152238', 
-             size = 15,
-             rotation = 30)
+#plt.annotate('Ancient Egypt', 
+#             (0, 98), 
+#             color = '#152238', 
+#             size = 15,
+#             #rotation = 30
+#             )
 plt.annotate('Santal', 
-             (6, 84), 
+             (6.4, 84), 
              color = '#152238', 
              size = 15,
-             rotation = 53)
+             #rotation = 53
+             )
 plt.xticks(np.arange(0, 20, 1))
 plt.xlabel('Number of traits fixed', size = small_text)
 plt.ylabel(r'$\mathrm{P_{remain}}$', size = small_text)
