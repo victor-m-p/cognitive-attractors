@@ -1,21 +1,23 @@
 ## Overview
 
-Code for "Cognitive Attractors in the Cultural Evolution of Religion".
+Pre-review code for "Cognitive Attractors in the Cultural Evolution of Religion".
 
 Victor Møller Poulsen and Simon DeDeo
 
 Submitted to *COGSCI*, 1 February 2023.
 
+Relies on preprocessing, and inference from https://github.com/victor-m-p/cultural-landscapes (https://www.mdpi.com/1099-4300/25/2/264)
+
 ## Components
 
 ### ```/data```
-* ```data/mdl_final```: processed DRH data (post-MPF).
+* ```data/mdl_experiments```: processed DRH data (post-MPF).
 * ```data/clean```: processed DRH data (pre-MPF).
 * ```data/reference```: reference files (i.e. ensuring links between questions and cultures). 
 * ```data/analysis```: files used for the DRH analysis in ```/DRH```. 
 
-Raw data from the DRH (i.e. pre-curation) is not provided given size limits. 
-This might be available upon request. 
+Raw data from the DRH (i.e. pre-curation) is not provided given size limits.
+The analysis presented here relies on the curation and inferred parameters of https://github.com/victor-m-p/cultural-landscapes.
 
 ### ```/fig```
 Figures for "Inferring Cultural Landscapes with the Inverse Ising Model". Currently only the figures for ```5. Results: The Database of Religious History``` (see ```/DRH``` for code). 
