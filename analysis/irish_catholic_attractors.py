@@ -23,7 +23,6 @@ clrs = [
     '#ffef55', # yellow
     '#f24f26', # red
 ] 
-
 clrs_nodeedge = [
     '#006b8a', # dark blue
     '#6da4b5', # light blue
@@ -221,6 +220,7 @@ for a, w in zip(arrows, weights):
 plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 ax.margins(0.15, 0.05)
 
+source = re.sub(" ", "_", source)
 plt.savefig(f'../fig/pdf/{source}_{config_orig}.pdf', bbox_inches = 'tight')
 plt.savefig(f'../fig/svg/{source}_{config_orig}.svg', bbox_inches = 'tight')
 
