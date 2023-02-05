@@ -1,3 +1,8 @@
+'''
+Convenience class for configurations. 
+VMP 2022-02-05: clean up, and converge with the corresponding class. 
+'''
+
 import pandas as pd 
 import numpy as np
 import random

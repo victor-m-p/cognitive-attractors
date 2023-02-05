@@ -1,3 +1,9 @@
+'''
+VMP 2022-02-05: experimental approaches to attractors
+Not used in the paper (currently). 
+'''
+
+
 import pandas as pd 
 import numpy as np 
 import os 

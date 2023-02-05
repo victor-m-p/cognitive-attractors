@@ -1,5 +1,7 @@
 ## Overview
 
+![](fig/svg/Irish Catholics_1017606.svg)
+
 Pre-review code for "Cognitive Attractors in the Cultural Evolution of Religion".
 
 Victor Møller Poulsen and Simon DeDeo

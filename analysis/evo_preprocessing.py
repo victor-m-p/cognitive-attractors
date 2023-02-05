@@ -1,3 +1,7 @@
+'''
+Come back and check how this fits into the larger scheme of things. 
+'''
+
 # COGSCI23
 import pandas as pd 
 import matplotlib.pyplot as plt 

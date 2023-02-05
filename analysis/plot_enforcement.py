@@ -56,23 +56,12 @@ hdi_50_u = hdi_df['hdi_50_u'].tolist()
 fig, ax = plt.subplots(figsize = (7, 5), dpi = 300)
 plt.fill_between(n_fixed_traits, hdi_95_l, hdi_95_u, color = 'tab:blue', alpha = 0.3)
 plt.fill_between(n_fixed_traits, hdi_50_l, hdi_50_u, color = 'tab:blue', alpha = 0.5)
-#plt.plot(upper_line['n_fixed_traits'].values,
-#         upper_line['prob_remain'].values, 
-#         color = '#152238',
-#         ls = '--')
 plt.plot(lower_line['n_fixed_traits'].values, 
          lower_line['prob_remain'].values, 
          color = '#152238',
          ls = '--'
          )
 plt.plot(n_fixed_traits, median_remain, color = '#152238', linewidth = 2)
-# labels
-#plt.annotate('Ancient Egypt', 
-#             (0, 98), 
-#             color = '#152238', 
-#             size = 15,
-#             #rotation = 30
-#             )
 plt.annotate('Santal', 
              (6.4, 84), 
              color = '#152238', 
@@ -84,9 +73,8 @@ plt.xlabel('Number of traits fixed', size = small_text)
 plt.ylabel(r'$\mathrm{P_{remain}}$', size = small_text)
 plt.savefig('../fig/enforcement/enforcement_hdi.pdf', bbox_inches = 'tight')
 
-## what are the medians and HDI for different values?
+## what are the medians and HDI for different values? ## 
 hdi_df['median'] = median_remain
-
 
 # temporary #
 import pandas as pd 
@@ -112,10 +100,7 @@ p_move = conf.p_move(configurations,
                         configuration_probabilities,
                         summary = False)
 
-
-
 question_reference['p_move'] = p_move
 question_reference['held_belief'] = conf.configuration
 question_reference = question_reference.drop(columns = ['question_id', 'question_id_drh', 'question_drh'])
 question_reference = question_reference.sort_values('p_move', ascending = False)
-question_reference

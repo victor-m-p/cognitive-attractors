@@ -3,14 +3,14 @@ include("configuration.jl")
 using .cn, Printf, Statistics, Distributions, DelimitedFiles, CSV, DataFrames, IterTools, StatsBase, Chain, FStrings
 
 # load shit 
-configuration_probabilities = readdlm("/home/vpoulsen/humanities-glass/data/analysis/configuration_probabilities.txt")
-configurations = readdlm("/home/vpoulsen/humanities-glass/data/analysis/configurations.txt", Int)
+configuration_probabilities = readdlm("/home/vpoulsen/cognitive-attractors/data/analysis/configuration_probabilities.txt")
+configurations = readdlm("/home/vpoulsen/cognitive-attractors/data/analysis/configurations.txt", Int)
 
 ## I need an array, rather than a matrix 
 configurations = cn.slicematrix(configurations)
 
 # load all maximum likelihood configurations 
-entry_config_filename = "/home/vpoulsen/humanities-glass/data/analysis/entry_maxlikelihood.csv"
+entry_config_filename = "/home/vpoulsen/cognitive-attractors/data/analysis/entry_maxlikelihood.csv"
 entry_maxlikelihood = DataFrame(CSV.File(entry_config_filename))
 config_ids = @chain entry_maxlikelihood begin _.config_id end
 unique_configs = unique(config_ids) # think right, but double check 
@@ -82,5 +82,5 @@ for original_idx in unique_configs
     end 
     end 
     original_idx = original_idx .- 1
-    CSV.write(f"/home/vpoulsen/humanities-glass/data/COGSCI23/attractors/t{threshold}_max{max_rows}_idx{original_idx}.csv", df)
+    CSV.write(f"/home/vpoulsen/cognitive-attractors/data/COGSCI23/attractors/t{threshold}_max{max_rows}_idx{original_idx}.csv", df)
 end 

@@ -1,3 +1,9 @@
+'''
+Dynamics of monitoring and punishing Gods.
+Not (currently) used in the paper.
+VMP 2022-02-05: save as .svg and .pdf 
+'''
+
 import numpy as np 
 import matplotlib.pyplot as plt 
 from tqdm import tqdm 
@@ -92,4 +98,5 @@ for text, nudge in zip(x.values(), nudge_list):
             verticalalignment = 'center',
             color = 'black')
     num += 1
-plt.savefig(f'../fig/dynamics/biggods_transitions_{n_samples}.pdf')
+plt.savefig(f'../fig/pdf/biggods_transitions_{n_samples}.pdf')
+plt.savefig(f'../fig/svg/biggods_transitions_{n_samples}.svg')

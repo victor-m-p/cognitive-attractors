@@ -1,6 +1,8 @@
-# install these packages into environment (e.g. enter Pkg REPL and use 'add [PKG]').
+#Convenience class for configurations. 
+#VMP 2022-02-05: clean up, and converge with the corresponding class. 
 
-module cn # begin module
+# install these packages into environment (e.g. enter Pkg REPL and use 'add [PKG]').
+module cn 
 using Printf, Statistics, Distributions, DelimitedFiles, CSV, DataFrames, IterTools, StatsBase, Chain, FStrings
 
 # little function here 

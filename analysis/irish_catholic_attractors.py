@@ -1,3 +1,9 @@
+'''
+Prettified version of the attractor plot for the configuration
+inhabited by the Irish Catholics. 
+VMP 2022-02-05: save as .svg and .pdf 
+'''
+
 import networkx as nx             # graph manipulation
 import numpy as np                # numerical utilities
 import matplotlib.pyplot as plt   # plotting
@@ -215,8 +221,8 @@ for a, w in zip(arrows, weights):
 plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 ax.margins(0.15, 0.05)
 
-plt.savefig(f'../fig/{source}_{config_orig}.pdf',
-            bbox_inches = 'tight')
+plt.savefig(f'../fig/pdf/{source}_{config_orig}.pdf', bbox_inches = 'tight')
+plt.savefig(f'../fig/svg/{source}_{config_orig}.svg', bbox_inches = 'tight')
 
 # What bit-flips trace the paths? # 
 question_reference = pd.read_csv('../data/analysis/question_reference.csv')

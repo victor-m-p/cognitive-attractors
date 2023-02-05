@@ -1,3 +1,9 @@
+'''
+Dynamics of child- and adult sacrifice.
+Not (currently) used in the paper.
+VMP 2022-02-05: save as .svg and .pdf 
+'''
+
 import numpy as np 
 import matplotlib.pyplot as plt 
 from tqdm import tqdm 
@@ -92,7 +98,8 @@ for text, nudge in zip(x.values(), nudge_list):
             verticalalignment = 'center',
             color = 'black')
     num += 1
-plt.savefig(f'../fig/dynamics/sacrifice_transitions_{n_samples}.pdf')
+plt.savefig(f'../fig/pdf/sacrifice_transitions_{n_samples}.pdf')
+plt.savefig(f'../fig/svg/sacrifice_transitions_{n_samples}.svg')
 
 # specifically spartan 
 ## only the maximum likelihood configuration
@@ -187,84 +194,5 @@ for text, nudge in zip(x.values(), nudge_list):
             verticalalignment = 'center',
             color = 'black')
     num += 1
-plt.savefig('../fig/dynamics/sacrifice_spartan_maxlikelihood.pdf')
-
-####### TEMPORARY ########
-# find religions without a belief in 11 # 
-import configuration as cn 
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
-pd.set_option('display.max_colwidth', None)
-d = pd.read_csv('/home/vmp/humanities-glass/data/analysis/entry_maxlikelihood.csv')
-unique_config_idx = d['config_id'].unique().tolist()
-unique_configs = configurations[[unique_config_idx]]
-
-presence = np.where(unique_configs[:, 10] == 1) 
-punish = np.where(unique_configs[:, 12] == -1)
-
-obs_cases = np.intersect1d(presence, punish)
-
-unique_config_idx = np.array(unique_config_idx)
-cases = unique_config_idx[obs_cases]
-
-d_case = d[d['config_id'].isin(cases)]
-d_case
-
-# double check one 
-config_id = 0
-ConfObj = cn.Configuration(config_id,
-                           configurations,
-                           configuration_probabilities)
-
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
-question_reference['sanity_check'] = ConfObj.configuration
-
-question_reference
-
-'''
-## sanity check ##
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
-spartan_idx = spartan_idx[0]
-import configuration as cn 
-SpartanObj = cn.Configuration(spartan_idx,
-                              configurations,
-                              configuration_probabilities)
-neighbor_probs = SpartanObj.neighbor_probabilities(configurations,
-                                                   configuration_probabilities,
-                                                   question_reference)
-
-
-
-
-tst = SpartanObj.pid_neighbors(configurations,
-                               configuration_probabilities)
-
-SpartanObj
-tst = SpartanObj.hamming_neighbors()
-SpartanObj.configuration
-'''
-
-'''
-# find monitor, but not punish 
-pd.set_option('display.max_colwidth', None)
-d = pd.read_csv('/home/vmp/humanities-glass/data/analysis/entry_maxlikelihood.csv')
-unique_config_idx = d['config_id'].unique().tolist()
-unique_configs = configurations[[unique_config_idx]]
-
-monitor = np.where(unique_configs[:, 11] == -1) 
-punish = np.where(unique_configs[:, 12] == 1)
-
-obs_cases = np.intersect1d(monitor, punish)
-unique_config_idx = np.array(unique_config_idx)
-cases = unique_config_idx[obs_cases]
-
-d_case = d[d['config_id'].isin(cases)]
-
-# double check one 
-config_id = 362112
-ConfObj = cn.Configuration(config_id,
-                           configurations,
-                           configuration_probabilities)
-
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
-question_reference['sanity_check'] = ConfObj.configuration
-'''
+plt.savefig('../fig/pdf/sacrifice_spartan_maxlikelihood.pdf')
+plt.savefig('../fig/svg/sacrifice_spartan_maxlikelihood.svg')

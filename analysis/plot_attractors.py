@@ -1,422 +1,112 @@
 '''
-VMP 2023-01-08:
-Plot attractors for n = 1, n = 2, n = 3
+Plot attractors where horizontal and vertical layout is given by kamada_kawai_layout.
+Not used in the paper (currently) but important to give an impression of the different
+kinds of local landscapes a configuration can be in. 
+VMP 2022-02-05
+
 '''
 
-# COGSCI23
 import pandas as pd 
-import matplotlib.pyplot as plt 
 import networkx as nx 
 import numpy as np 
-import operator 
+import configuration as cn 
+import re
+import matplotlib.pyplot as plt 
+import os 
+from tqdm import tqdm 
+from unidecode import unidecode
 
-def plot_net(d, n, graph_type, suptitle, filename, 
-             edge_multiplier, node_multiplier, pos = False,
-             GCC = True, remove_self = False,
-             k = 1, alpha = True, in_degree = False,
-             GCC_o = False, node_labels = False): 
-    
-    # n = 2
-    d = d.sort_values('weight').groupby('config_from').tail(n)
-
-    if remove_self: 
-        d = d[d['config_from'] != d['config_to']]
-
-    # try to just plot this as is ...
-    G = nx.from_pandas_edgelist(d,
-                                source = 'config_from',
-                                target = 'config_to',
-                                edge_attr = 'weight',
-                                create_using=graph_type)
-
-    # only GCC
-    if str(GCC).isnumeric(): # find better approach
-        print('GCC')
-        if graph_type == nx.DiGraph:
-            H = G.to_undirected()
-            Gcc = sorted(nx.connected_components(H), key=len, reverse=True)
-        else: 
-            Gcc = sorted(nx.connected_components(G), key=len, reverse=True)
-        G = G.subgraph(Gcc[GCC])
-
-    # only component with most observed states
-    if str(GCC_o).isnumeric():
-        print('GCC_o')
-        H = G.to_undirected()
-        Gcc = sorted(nx.connected_components(H), key = len, reverse = True)
-        max_dct = {}
-        for num, ele in enumerate(Gcc): 
-            G_ele = G.subgraph(Gcc[num])
-            uniq_from = np.unique([x for x, y, z in G_ele.edges(data = True)])
-            n_from = len(uniq_from)
-            max_dct[num] = n_from
-        sorted_d = dict(sorted(max_dct.items(), key=operator.itemgetter(1),reverse=True))
-        n = list(sorted_d.keys())[GCC_o]
-        G = G.subgraph(Gcc[n])
-
-    # edgeweight 
-    edge_weight = dict(nx.get_edge_attributes(G, 'weight'))
-    edge_list = []
-    edge_w = []
-    for x, y in edge_weight.items(): 
-        edge_list.append(x)
-        edge_w.append(y)
-        
-    # degree 
-    if in_degree: 
-        degree = dict(G.in_degree(weight = 'weight'))
-    else: 
-        degree = dict(G.degree(weight = 'weight')) # new change
-    
-    node_list = []
-    node_deg = []
-    for x, y in degree.items(): 
-        node_list.append(x)
-        node_deg.append(y)
-
-    # color 
-    uniq_from = np.unique([x for x, y, z in G.edges(data = True)])
-    node_color = ['tab:red' if x in uniq_from else 'tab:orange' for x in node_list]
-
-    # position 
-    if not pos: 
-        n = len(G.nodes())
-        pos = nx.spring_layout(G, weight = 'weight',
-                               k = k/np.sqrt(n),
-                               seed = 4)
-
-    # alpha 
-    if alpha: 
-        alpha_val = [x/max(edge_w)*0.8 for x in edge_w]
-    else: 
-        alpha_val = 1
-        
-    # plot 
-    fig, ax = plt.subplots(dpi = 300)
-    plt.axis('off')
-    nx.draw_networkx_nodes(G, pos, 
-                        nodelist = node_list, 
-                        node_size = [x*node_multiplier for x in node_deg],
-                        node_color = node_color,
-                        linewidths = 0.5,
-                        edgecolors = 'black')
-    nx.draw_networkx_edges(G, pos, 
-                        edgelist = edge_list,
-                        width = [x*edge_multiplier for x in edge_w],
-                        alpha = alpha_val,
-                        edge_color = 'tab:blue')
-    if node_labels: 
-        labels = {}
-        for i in G.nodes():
-            label = node_labels.get(i)
-            if label: 
-                labels[i] = label
-            else: 
-                labels[i] = ''
-        nx.draw_networkx_labels(G, pos, 
-                                labels = labels)
-    plt.suptitle(f'{suptitle}', size = large_text)
-    plt.savefig(f'../fig/COGSCI23/networks/{filename}.pdf')
-
-
-# prep labels 
-focus_list = ['Pythagorean', #y
-              'Peyote', #y
-              'Tsonga', #y
-              'Religion in Mesopotamia', #
-              'Roman Imperial Cult', #y
-              'Free Methodist Church', #
-              'Jehovah', #y
-              'Calvinism', #y
-              'Jesuits', #y
-              'Ancient Egypt - the Ramesside', #y
-              'Islam in Aceh', #y
-              'Wogeo', #y
-              'Sokoto',
-              'Cistercians'] #y
+# preprocessing 
+from fun import bin_states 
+configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
+n_nodes = 20
+configurations = bin_states(n_nodes) 
 
 entry_maxlikelihood = pd.read_csv('../data/analysis/entry_maxlikelihood.csv')
-entry_list = []
-for focus_entry in focus_list:
-    entry_sub = entry_maxlikelihood[entry_maxlikelihood['entry_name'].str.contains(focus_entry)]
-    entry_list.append(entry_sub)
-annotations = pd.concat(entry_list)
-annotations = {
-    385536: 'Pythagoreanism',
-    360960: 'Peyote',
-    634758: 'Tsonga',
-    769926: 'Mesopotamia',
-    769927: 'Roman',
-    362368: 'Free Methodist',
-    362374: 'Jehovah',
-    886662: 'Calvinism',
-    1027974: 'Jesuits in Britain',
-    1027975: 'Ancient Egypt',
-    1025927: 'Islam in Aceh',
-    1041926: 'Wogeo',
-    1025538: 'Sokoto',
-    1025926: 'Cistercians'
-}
+entry_maxlikelihood = entry_maxlikelihood[['config_id', 'entry_name']]
+entry_maxlikelihood = entry_maxlikelihood.groupby('config_id').sample(n=1, random_state=1)
+entry_maxlikelihood['entry_name'] = [re.sub(r"(\(.*\))|(\[.*\])", "", x) for x in entry_maxlikelihood['entry_name']]
+entry_maxlikelihood['entry_name'] = [re.sub(r"\/", " ", x) for x in entry_maxlikelihood['entry_name']]
+entry_maxlikelihood['entry_name'] = [unidecode(text).strip() for text in entry_maxlikelihood['entry_name']]
 
-# setup 
-small_text, large_text = 12, 18
+files = os.listdir('../data/COGSCI23/attractors')
 
-#### SUBSAMPLE APPROACH ####
-d_edgelist = pd.read_csv('../data/COGSCI23/evo_clean/subsample.csv')
-
-### t = 10 ###
-d_edgelist = d_edgelist[d_edgelist['t_to'] == 11]
-d_edgelist_size = d_edgelist.groupby(['config_from', 'config_to']).size().reset_index(name = 'weight')
-
-### t = 10 ###
-# with self-loops
-plot_net(d = d_edgelist_size,
-         n = 3,
-         graph_type = nx.DiGraph, 
-         suptitle = 't = 10',
-         filename = 't_10_n_3',
-         edge_multiplier = 0.02,
-         node_multiplier = 1,
-         remove_self = False,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-# without self-loops
-plot_net(d = d_edgelist_size,
-         n = 3,
-         graph_type = nx.DiGraph, 
-         suptitle = 't = 10',
-         filename = 't_10_n_3_ns',
-         edge_multiplier = 0.04,
-         node_multiplier = 1,
-         remove_self = True,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-# only data-states
-d_edgelist_from = d_edgelist_size[['config_from']].drop_duplicates()
-d_edgelist_from = d_edgelist_from.rename(columns = {'config_from': 'config_to'})
-d_edgelist_obs = d_edgelist_size.merge(d_edgelist_from, on = 'config_to', how ='inner')
-
-# with self-loops
-plot_net(d = d_edgelist_obs,
-         n = 3,
-         graph_type = nx.DiGraph, 
-         suptitle = 't = 10',
-         filename = 't_10_n_3_ns_obs',
-         edge_multiplier = 0.02,
-         node_multiplier = 0.3,
-         remove_self = True,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-### t = 100 ###
-d_edgelist = pd.read_csv('../data/COGSCI23/evo_clean/subsample.csv')
-d_edgelist = d_edgelist[d_edgelist['t_to'] == 91]
-d_edgelist_size = d_edgelist.groupby(['config_from', 'config_to']).size().reset_index(name = 'weight')
-d_edgelist_from = d_edgelist_size[['config_from']].drop_duplicates()
-d_edgelist_from = d_edgelist_from.rename(columns = {'config_from': 'config_to'})
-d_edgelist_obs = d_edgelist_size.merge(d_edgelist_from, on = 'config_to', how ='inner')
-
-# now we can connect with n = 2
-# remove self-loops 
-plot_net(d = d_edgelist_obs,
-         n = 2,
-         graph_type = nx.DiGraph, 
-         suptitle = 't = 100',
-         filename = 't_100_n_2_obs_ns',
-         edge_multiplier = 0.02,
-         node_multiplier = 0.3,
-         remove_self = True,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-# do not remove self-loops
-plot_net(d = d_edgelist_obs,
-         n = 2, # often self / other
-         graph_type = nx.DiGraph, 
-         suptitle = 't = 100',
-         filename = 't_100_n_2_obs',
-         edge_multiplier = 0.02,
-         node_multiplier = 0.3,
-         remove_self = False,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-# based on the weighted 
-weighted = pd.read_csv('../data/COGSCI23/evo_clean/weighted.csv')
-plot_net(d = weighted,
-         n = 2, # often self / other
-         graph_type = nx.DiGraph, 
-         suptitle = 'weighted',
-         filename = 't_w_n_2',
-         edge_multiplier = 0.001,
-         node_multiplier = 0.01,
-         remove_self = False,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-# remove self-loops 
-plot_net(d = weighted,
-         n = 2, # often self / other
-         graph_type = nx.DiGraph, 
-         suptitle = 'weighted',
-         filename = 't_w_n_2_ns',
-         edge_multiplier = 0.001,
-         node_multiplier = 0.01,
-         remove_self = True,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-# with other states n = 3
-plot_net(d = weighted,
-         n = 3, # often self / other
-         graph_type = nx.DiGraph, 
-         suptitle = 'weighted',
-         filename = 't_w_n_3_ns',
-         edge_multiplier = 0.001,
-         node_multiplier = 0.01,
-         remove_self = True,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-# without other states = 3
-d_edgelist_from = weighted[['config_from']].drop_duplicates()
-d_edgelist_from = d_edgelist_from.rename(columns = {'config_from': 'config_to'})
-d_edgelist_obs = d_edgelist_size.merge(d_edgelist_from, on = 'config_to', how ='inner')
-plot_net(d = d_edgelist_obs,
-         n = 3, # often self / other
-         graph_type = nx.DiGraph, 
-         suptitle = 'weighted',
-         filename = 't_w_n_3_ns_obs',
-         edge_multiplier = 0.01,
-         node_multiplier = 0.01,
-         remove_self = True,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-# based on the shifted 
-## why no labels?
-shifted = pd.read_csv('../data/COGSCI23/evo_clean/shift_weighted.csv')
-plot_net(d = shifted,
-         n = 2, # often self / other
-         graph_type = nx.DiGraph, 
-         suptitle = 'shifted',
-         filename = 't_s_n_2',
-         edge_multiplier = 0.1,
-         node_multiplier = 3,
-         remove_self = False,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-plot_net(d = shifted,
-         n = 2, # often self / other
-         graph_type = nx.DiGraph, 
-         suptitle = 'shifted',
-         filename = 't_s_n_2_ns',
-         edge_multiplier = 0.3,
-         node_multiplier = 10,
-         remove_self = True,
-         GCC_o = 0,
-         alpha = False,
-         k = 1,
-         node_labels = annotations)
-
-## why are we not getting labels? ## 
-## fix later ## 
-d = shifted
-n = 3
-# only top two 
-d = d.sort_values('weight').groupby('config_from').tail(n)
-# try to just plot this as is ...
-G = nx.from_pandas_edgelist(d,
-                            source = 'config_from',
-                            target = 'config_to',
-                            edge_attr = 'weight',
-                            create_using=nx.DiGraph)
-# only GCC
-GCC = 0
-H = G.to_undirected()
-Gcc = sorted(nx.connected_components(H), key=len, reverse=True)
-G = G.subgraph(Gcc[GCC])
-
-# alpha 
-edge_weight = dict(nx.get_edge_attributes(G, 'weight'))
-edge_list = []
-edge_w = []
-for x, y in edge_weight.items(): 
-    edge_list.append(x)
-    edge_w.append(y)
+for file in tqdm(files): 
+    config_orig = int(re.match(r't0.5_max5000_idx(\d+).csv', file)[1])
+    d = pd.read_csv(f'../data/COGSCI23/attractors/{file}')
+    d = d[['config_from', 'config_to', 'probability']].drop_duplicates()
     
-# degree 
-degree = dict(G.degree(weight = 'weight')) # new change
+    if not len(d) == 0: 
+        # find strength of self-loops 
+        config_from = d['config_from'].unique().tolist()
+        config_to = d['config_to'].unique().tolist()
+        config_total = list(set(config_from + config_to))
 
-node_list = []
-node_deg = []
-for x, y in degree.items(): 
-    node_list.append(x)
-    node_deg.append(y)
+        # add data
+        naive_path = pd.read_csv(f'../data/COGSCI23/max_attractor/idx{config_orig}.csv')
+        naive_path = naive_path[['config_from', 'config_to']]
+        naive_path['edge_color'] = 'tab:red'
+        d = d.merge(naive_path, on = ['config_from', 'config_to'], how = 'left').fillna('tab:grey')
 
-# color 
-uniq_from = np.unique([x for x, y, z in G.edges(data = True)])
-node_color = ['tab:red' if x in uniq_from else 'tab:orange' for x in node_list]
+        # can take a litle bit 
+        # could move to julia 
+        remain_probability = []
+        for idx in config_total: 
+            ConfObj = cn.Configuration(idx, 
+                                    configurations,
+                                    configuration_probabilities)
+            p_move = ConfObj.p_move(configurations,
+                                    configuration_probabilities)
+            p_stay = 1 - p_move 
+            remain_probability.append((idx, p_stay))
 
-# position 
-k = 1
-n = len(G.nodes())
-pos = nx.spring_layout(G, weight = 'weight',
-                        k = k/np.sqrt(n),
-                        seed = 4)
+        remain_probability = pd.DataFrame(remain_probability, columns = ['config_id', 'P(remain)'])
 
-# alpha 
-alpha_val = 1
+        # observed maximum-likelihood state & label 
+        attractors = list(set(config_to) - set(config_from))
+        node_attributes = remain_probability.merge(entry_maxlikelihood, on = 'config_id', how = 'left').fillna("")
+        node_attributes['node_color'] = ['tab:blue' if x else 'tab:orange' for x in node_attributes['entry_name']]
+        node_attributes['node_color'] = ['tab:red' if x == config_orig else y for x, y in zip(node_attributes['config_id'], node_attributes['node_color'])]
+        node_attributes['node_color'] = ['tab:olive' if x in attractors else y for x, y in zip(node_attributes['config_id'], node_attributes['node_color'])]
 
-# plot 
-node_multiplier = 10
-edge_multiplier = 0.3
+        source = node_attributes[node_attributes['node_color'] == 'tab:red']['entry_name'].values[0]
+        source = re.split('\n', source)[0]
 
-fig, ax = plt.subplots(dpi = 300)
-plt.axis('off')
-nx.draw_networkx_nodes(G, pos, 
-                    nodelist = node_list, 
-                    node_size = [x*node_multiplier for x in node_deg],
-                    node_color = node_color,
-                    linewidths = 0.5,
-                    edgecolors = 'black')
-nx.draw_networkx_edges(G, pos, 
-                    edgelist = edge_list,
-                    width = [x*edge_multiplier for x in edge_w],
-                    alpha = alpha_val,
-                    edge_color = 'tab:blue')
-node_labels = annotations
-if node_labels: 
-    labels = {}
-    for i in G.nodes():
-        label = node_labels.get(i)
-        if label: 
-            labels[i] = label
-        else: 
-            labels[i] = ''
-    nx.draw_networkx_labels(G, pos, 
-                            labels = labels)
-plt.suptitle(f'test', size = large_text)
+        # create network 
+        d = d.rename(columns = {'probability': 'weight'})
+        G = nx.from_pandas_edgelist(d, source = 'config_from',
+                                    target = 'config_to', 
+                                    edge_attr = ['weight', 'edge_color'],
+                                    create_using = nx.DiGraph)
+
+        # add node information
+        labels = {}
+        for _, row in node_attributes.iterrows(): 
+            config_id = row['config_id']
+            G.nodes[config_id]['p_remain'] = row['P(remain)']
+            G.nodes[config_id]['node_color'] = row['node_color']
+            # only label attractors & starting state 
+            if row['node_color'] in ['tab:olive', 'tab:red']:
+                labels[config_id] = row['entry_name']
+            else: 
+                labels[config_id] = ""
+
+        # extract information
+        node_size = list(nx.get_node_attributes(G, 'p_remain').values())
+        node_color = list(nx.get_node_attributes(G, 'node_color').values())
+        edge_size = list(nx.get_edge_attributes(G, 'weight').values())
+        edge_color = list(nx.get_edge_attributes(G, 'edge_color').values())
+
+        # pos 
+        pos = nx.kamada_kawai_layout(G, weight = 'weight')
+
+        # plot 
+        fig, ax = plt.subplots(dpi = 300)
+        plt.axis('off')
+        nx.draw_networkx_nodes(G, pos, node_size = [x*25 for x in node_size], node_color = node_color)
+        nx.draw_networkx_edges(G, pos, width = edge_size, edge_color = edge_color)
+        nx.draw_networkx_labels(G, pos, labels = labels, font_size = 6)
+        plt.suptitle(f'{source}', size = 15)
+        plt.savefig(f'../fig/pdf/attractors/{source}_{config_orig}.pdf')
+        plt.savefig(f'../fig/pdf/attractors/{source}_{config_orig}.pdf')
+        plt.close()

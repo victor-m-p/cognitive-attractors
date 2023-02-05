@@ -1,6 +1,7 @@
 '''
 VMP 2022-12-12: 
 Helper functions for the analysis of DRH data.
+Converge with the corresponding document. 
 '''
 
 import numpy as np
