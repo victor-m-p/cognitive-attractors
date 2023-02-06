@@ -148,7 +148,8 @@ plt.xlabel(r'$\mathrm{log} \; \mathrm{P(i)}$', size = small_text)
 plt.ylabel(r'$\mathrm{P_{remain}}$', size = small_text)
 plt.xlim(-14, -3.6)
 ## save figure 
-plt.savefig('../fig/stability.pdf')
+plt.savefig('../fig/pdf/stability.pdf', bbox_inches = 'tight')
+plt.savefig('../fig/svg/stability.svg', bbox_inches = 'tight')
 
 ''' create groups in the data '''
 

@@ -80,6 +80,7 @@ for file in tqdm(files):
 
         # for logging
         source = node_attributes[node_attributes['config_id'] == config_orig]['entry_name'].tolist()[0]
+        source = re.sub(" ", "-", source)
         
         # add data
         naive_path = pd.read_csv(f'../data/COGSCI23/max_attractor/idx{config_orig}.csv')
@@ -144,5 +145,6 @@ for file in tqdm(files):
                             edgelist = edgelist_sorted,
                             edge_color = edge_color,
                             width = edge_width)
-        plt.savefig(f'../fig/attractor_plots/{source}_{config_orig}.pdf')
+        plt.savefig(f'../fig/pdf/attractors_vertical/{source}_{config_orig}.pdf')
+        plt.savefig(f'../fig/svg/attractors_vertical/{source}_{config_orig}.svg')
         plt.close()

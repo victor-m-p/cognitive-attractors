@@ -71,7 +71,8 @@ plt.annotate('Santal',
 plt.xticks(np.arange(0, 20, 1))
 plt.xlabel('Number of traits fixed', size = small_text)
 plt.ylabel(r'$\mathrm{P_{remain}}$', size = small_text)
-plt.savefig('../fig/enforcement/enforcement_hdi.pdf', bbox_inches = 'tight')
+plt.savefig('../fig/pdf/enforcement_hdi.pdf', bbox_inches = 'tight')
+plt.savefig('../fig/svg/enforcement_hdi.svg', bbox_inches = 'tight')
 
 ## what are the medians and HDI for different values? ## 
 hdi_df['median'] = median_remain

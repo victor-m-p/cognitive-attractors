@@ -107,6 +107,7 @@ for file in tqdm(files):
         nx.draw_networkx_edges(G, pos, width = edge_size, edge_color = edge_color)
         nx.draw_networkx_labels(G, pos, labels = labels, font_size = 6)
         plt.suptitle(f'{source}', size = 15)
+        source = re.sub(" ", "_", source)
         plt.savefig(f'../fig/pdf/attractors/{source}_{config_orig}.pdf')
-        plt.savefig(f'../fig/pdf/attractors/{source}_{config_orig}.pdf')
+        plt.savefig(f'../fig/svg/attractors/{source}_{config_orig}.svg')
         plt.close()
