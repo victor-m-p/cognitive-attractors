@@ -203,38 +203,3 @@ class Configuration:
     # instantiate civilization class
     def to_civilization(x): 
         pass 
-
-'''
-# load documents
-entry_configuration_master = pd.read_csv('../data/analysis/entry_configuration_master.csv')
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
-
-# generate all states
-n_nodes = 20
-from fun import bin_states 
-configurations = bin_states(n_nodes) 
-
-### test some functionality ###
-ConfObj = Configuration(769975, 
-                        configurations, 
-                        configuration_probabilities)
-
-ConfObj.p_move(configurations,
-               configuration_probabilities,
-               summary = True)
-
-# test the sampling to see 
-n = 2
-num_move = []
-for i in range(1000): 
-    nc = ConfObj.move(configurations,
-                      configuration_probabilities,
-                      n = n)
-    if nc.id == ConfObj.id: 
-        num_move.append(0)
-    else: 
-        num_move.append(1)
-
-sum(num_move) # 131 reasonable. 
-'''
