@@ -44,7 +44,8 @@ plt.yticks(np.arange(0, 20, 1),
            size = 15)
 plt.vlines(global_mean, ymin = 0, ymax = 20, color = 'tab:red', ls = '--')
 plt.xlabel('Mean probability')
-plt.savefig('../fig/feature_stability.pdf', bbox_inches = 'tight')
+plt.savefig('../fig/pdf/feature_stability.pdf', bbox_inches = 'tight')
+plt.savefig('../fig/svg/feature_stability.svg', bbox_inches = 'tight')
 
 ## look at standard deviation (much larger than actual difference?) ##
 # ...
@@ -84,7 +85,8 @@ plt.yticks(np.arange(0, 20, 1),
            top_five_df['question'].values, 
            size = 15)
 plt.xlabel('n(enforced first five)')
-plt.savefig('../fig/number_enforced_first_five.pdf', bbox_inches = 'tight')
+plt.savefig('../fig/pdf/number_enforced_first_five.pdf', bbox_inches = 'tight')
+plt.savefig('../fig/svg/number_enforced_first_five.svg', bbox_inches = 'tight')
 
 top_five_df = top_five_df.assign(percent_top_five = lambda x: (x['count']/260)*100)
 top_five_df.sort_values('count', ascending = False)
