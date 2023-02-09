@@ -1,19 +1,17 @@
 '''
 Supplementary information plots.
+VMP 2023-02-08: light refactoring, should be cleaned more (has been re-run)
 '''
 
 import pandas as pd 
 import numpy as np 
-import seaborn as sns 
 import matplotlib.pyplot as plt 
 import configuration as cn
 from tqdm import tqdm 
 
 # preprocessing 
-from fun import bin_states 
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
-n_nodes = 20
-configurations = bin_states(n_nodes) 
+configuration_probabilities = np.loadtxt('../data/preprocessing/configuration_probabilities.txt')
+configurations = np.loadtxt('../data/preprocessing/configurations.txt', dtype = int)
 
 # find probability for different attributes
 probability_list = []
@@ -27,7 +25,7 @@ for i in range(20):
 probability_df = pd.DataFrame(probability_list, columns = ['question_id', 'mean(prob)', 'std(prob)'])
 
 # match with questions 
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
+question_reference = pd.read_csv('../data/preprocessing/question_reference.csv')
 question_reference = question_reference[['question_id', 'question']]
 question_probability = question_reference.merge(probability_df, on = 'question_id', how = 'inner')
 question_probability = question_probability.sort_values('mean(prob)').reset_index()
@@ -51,8 +49,8 @@ plt.savefig('../fig/svg/feature_stability.svg', bbox_inches = 'tight')
 # ...
 
 # most enforced practices
-d_enforcement = pd.read_csv('../data/COGSCI23/enforcement_observed.csv')
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
+d_enforcement = pd.read_csv('../data/analysis/enforcement_observed.csv')
+question_reference = pd.read_csv('../data/preprocessing/question_reference.csv')
 observed_configs = d_enforcement['config_id'].unique().tolist()
 
 # takes a couple of minutes
@@ -63,11 +61,8 @@ for config_idx in tqdm(observed_configs):
                             configurations, 
                             configuration_probabilities)
 
-    df = ConfObj.neighbor_probabilities(configurations,
-                                        configuration_probabilities,
-                                        question_reference,
-                                        top_n = 5)
-
+    df = ConfObj.transition_probs_to_neighbors(question_reference)
+    df = df.sort_values('transition_prob', ascending = False).head(5).reset_index()
     df = df[['question_id', 'question']]
     df['config_id'] = config_idx 
     top_five_list.append(df)
@@ -92,7 +87,7 @@ top_five_df = top_five_df.assign(percent_top_five = lambda x: (x['count']/260)*1
 top_five_df.sort_values('count', ascending = False)
 
 # tables
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
+question_reference = pd.read_csv('../data/preprocessing/question_reference.csv')
 
 '''
 ### sacrifice ###
@@ -154,9 +149,9 @@ import configuration as cn
 from tqdm import tqdm 
 
 # load documents
-entry_maxlikelihood = pd.read_csv('../data/analysis/entry_maxlikelihood.csv')
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
+entry_maxlikelihood = pd.read_csv('..../data/preprocessing/entry_maxlikelihood.csv')
+configuration_probabilities = np.loadtxt('..../data/preprocessing/configuration_probabilities.txt')
+question_reference = pd.read_csv('..../data/preprocessing/question_reference.csv')
 
 # generate all states
 n_nodes = 20

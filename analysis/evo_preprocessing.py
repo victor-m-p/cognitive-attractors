@@ -1,18 +1,17 @@
 '''
 Come back and check how this fits into the larger scheme of things. 
+VMP 2023-02-8: this has not been updated since 2020-12-10 becase it is not used in COGSCI23.
+Might be useful for future work or an updated version. 
 '''
 
-# COGSCI23
+# loads 
 import pandas as pd 
-import matplotlib.pyplot as plt 
-import seaborn as sns 
 import numpy as np 
 from tqdm import tqdm
-from matplotlib.ticker import MaxNLocator
 import os 
 
 # read all files 
-path = '../data/COGSCI23/evo_raw'
+path = '../data/analysis/evo_raw'
 dir_list = os.listdir(path)
 
 ### subsample every 10 steps ###
@@ -41,7 +40,7 @@ d_edgelist = pd.concat([d_from.reset_index(drop=True),
 
 # save 
 d_edgelist_save = d_edgelist.drop(columns = ['t_from'])
-d_edgelist_save.to_csv('../data/COGSCI23/evo_clean/subsample.csv', index = False)
+d_edgelist_save.to_csv('../data/analysis/evo_clean/subsample.csv', index = False)
 
 ### collapse to mean ###
 n_simulations = 100
@@ -65,7 +64,7 @@ for filename in dir_list:
     # add to lists 
     list_agg.append(d_weight)
 d_weight = pd.concat(list_agg)
-d_weight.to_csv('../data/COGSCI23/evo_clean/weighted.csv', index = False)
+d_weight.to_csv('../data/analysis/evo_clean/weighted.csv', index = False)
 
 ### shift data ###
 n_simulations = 100
@@ -89,11 +88,11 @@ for filename in dir_list:
     d['config_to'] = d.groupby(['simulation', 'config_orig'])['config_from'].shift(-1)
     d = d.dropna()
     # add to list 
-    d.to_csv(f'../data/COGSCI23/evo_shift/shift_{filename}', index = False)
+    d.to_csv(f'../data/analysis/evo_shift/shift_{filename}', index = False)
 
 ### collapse shifted data ###
 # read all files 
-path = '../data/COGSCI23/evo_shift'
+path = '../data/analysis/evo_shift'
 dir_list = os.listdir(path)
 list_agg = []
 for filename in dir_list: 
@@ -101,10 +100,10 @@ for filename in dir_list:
     d_shift = d_shift.groupby(['config_from', 'config_to']).size().reset_index(name = 'weight')
     list_agg.append(d_shift)
 d_shift_weight = pd.concat(list_agg)
-d_shift_weight.to_csv(f'../data/COGSCI23/evo_clean/shift_weighted.csv', index = False)
+d_shift_weight.to_csv(f'../data/analysis/evo_clean/shift_weighted.csv', index = False)
 
 ### hamming distance ###
-weighted = pd.read_csv('../data/COGSCI23/evo_clean/weighted.csv')
+weighted = pd.read_csv('../data/analysis/evo_clean/weighted.csv')
 
 # compute hamming
 d_pairs = weighted[['config_from', 'config_to']].drop_duplicates()
@@ -114,7 +113,7 @@ import configuration as cn
 from fun import bin_states 
 
 # preparation
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
+configuration_probabilities = np.loadtxt('../data/preprocessing/configuration_probabilities.txt')
 n_nodes = 20
 configurations = bin_states(n_nodes) 
 
@@ -136,4 +135,4 @@ d_hamming = pd.DataFrame(hamming_list,
                          columns = ['config_from', 'config_to', 'hamming_dist'])
 
 # save 
-d_hamming.to_csv('../data/COGSCI23/evo_clean/hamming.csv', index = False)
+d_hamming.to_csv('../data/analysis/evo_clean/hamming.csv', index = False)

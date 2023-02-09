@@ -2,8 +2,7 @@
 Plot attractors where horizontal and vertical layout is given by kamada_kawai_layout.
 Not used in the paper (currently) but important to give an impression of the different
 kinds of local landscapes a configuration can be in. 
-VMP 2022-02-05
-
+VMP 2023-02-08: light refactoring 
 '''
 
 import pandas as pd 
@@ -16,24 +15,23 @@ import os
 from tqdm import tqdm 
 from unidecode import unidecode
 
-# preprocessing 
-from fun import bin_states 
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
-n_nodes = 20
-configurations = bin_states(n_nodes) 
+# loads 
+configuration_probabilities = np.loadtxt('../data/preprocessing/configuration_probabilities.txt')
+configurations = np.loadtxt('../data/preprocessing/configurations.txt', dtype = int)
 
-entry_maxlikelihood = pd.read_csv('../data/analysis/entry_maxlikelihood.csv')
+# preprocessing 
+entry_maxlikelihood = pd.read_csv('../data/preprocessing/entry_maxlikelihood.csv')
 entry_maxlikelihood = entry_maxlikelihood[['config_id', 'entry_name']]
 entry_maxlikelihood = entry_maxlikelihood.groupby('config_id').sample(n=1, random_state=1)
 entry_maxlikelihood['entry_name'] = [re.sub(r"(\(.*\))|(\[.*\])", "", x) for x in entry_maxlikelihood['entry_name']]
 entry_maxlikelihood['entry_name'] = [re.sub(r"\/", " ", x) for x in entry_maxlikelihood['entry_name']]
 entry_maxlikelihood['entry_name'] = [unidecode(text).strip() for text in entry_maxlikelihood['entry_name']]
 
-files = os.listdir('../data/COGSCI23/attractors')
+files = os.listdir('../data/analysis/attractors')
 
 for file in tqdm(files): 
     config_orig = int(re.match(r't0.5_max5000_idx(\d+).csv', file)[1])
-    d = pd.read_csv(f'../data/COGSCI23/attractors/{file}')
+    d = pd.read_csv(f'../data/analysis/attractors/{file}')
     d = d[['config_from', 'config_to', 'probability']].drop_duplicates()
     
     if not len(d) == 0: 
@@ -43,7 +41,7 @@ for file in tqdm(files):
         config_total = list(set(config_from + config_to))
 
         # add data
-        naive_path = pd.read_csv(f'../data/COGSCI23/max_attractor/idx{config_orig}.csv')
+        naive_path = pd.read_csv(f'../data/analysis/max_attractor/idx{config_orig}.csv')
         naive_path = naive_path[['config_from', 'config_to']]
         naive_path['edge_color'] = 'tab:red'
         d = d.merge(naive_path, on = ['config_from', 'config_to'], how = 'left').fillna('tab:grey')
@@ -55,8 +53,7 @@ for file in tqdm(files):
             ConfObj = cn.Configuration(idx, 
                                     configurations,
                                     configuration_probabilities)
-            p_move = ConfObj.p_move(configurations,
-                                    configuration_probabilities)
+            p_move = ConfObj.p_move()
             p_stay = 1 - p_move 
             remain_probability.append((idx, p_stay))
 

@@ -1,6 +1,6 @@
 '''
 Helper functions for the analysis of DRH data.
-VMP 2022-02-06: refactored with chatGPT and docstrings. 
+VMP 2023-02-06: refactored with chatGPT and docstrings. 
 '''
 
 import numpy as np

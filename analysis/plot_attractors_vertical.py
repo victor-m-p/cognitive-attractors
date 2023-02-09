@@ -1,5 +1,5 @@
 '''
-VMP 2022-01-30: this is the one we actually use. 
+VMP 2023-01-30: this is the one we actually use. 
 this really needs a cleanup
 '''
 
@@ -23,19 +23,19 @@ clrs = [
     '#f24f26',
 ] 
 
-entry_maxlikelihood = pd.read_csv('../data/analysis/entry_maxlikelihood.csv')
+entry_maxlikelihood = pd.read_csv('..../data/preprocessing/entry_maxlikelihood.csv')
 entry_maxlikelihood = entry_maxlikelihood[['config_id', 'entry_name']]
 entry_maxlikelihood = entry_maxlikelihood.groupby('config_id').sample(n=1, random_state=1)
 entry_maxlikelihood['entry_name'] = [re.sub(r"(\(.*\))|(\[.*\])", "", x) for x in entry_maxlikelihood['entry_name']]
 entry_maxlikelihood['entry_name'] = [re.sub(r"\/", " ", x) for x in entry_maxlikelihood['entry_name']]
 entry_maxlikelihood['entry_name'] = [unidecode(text).strip() for text in entry_maxlikelihood['entry_name']]
 
-files = os.listdir('../data/COGSCI23/attractors')
+files = os.listdir('../data/analysis/attractors')
 
 for file in tqdm(files): 
     config_orig = int(re.match(r't0.5_max5000_idx(\d+).csv', file)[1])
 
-    d = pd.read_csv(f'../data/COGSCI23/attractors/{file}')
+    d = pd.read_csv(f'../data/analysis/attractors/{file}')
     d = d[['config_from', 'config_to', 'probability']].drop_duplicates()
     
     if not len(d) == 0: 
@@ -44,7 +44,7 @@ for file in tqdm(files):
         config_to = d['config_to'].unique().tolist()
         config_uniq = list(set(config_from + config_to))
 
-        configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
+        configuration_probabilities = np.loadtxt('..../data/preprocessing/configuration_probabilities.txt')
         p = configuration_probabilities[config_uniq]
         config_probs = pd.DataFrame({
             'config_id': config_uniq,
@@ -83,7 +83,7 @@ for file in tqdm(files):
         source = re.sub(" ", "-", source)
         
         # add data
-        naive_path = pd.read_csv(f'../data/COGSCI23/max_attractor/idx{config_orig}.csv')
+        naive_path = pd.read_csv(f'../data/analysis/max_attractor/idx{config_orig}.csv')
         naive_path = naive_path[['config_from', 'config_to']]
         naive_path['edge_color'] = 'k'
         d = d.merge(naive_path, on = ['config_from', 'config_to'], how = 'left').fillna('tab:grey')

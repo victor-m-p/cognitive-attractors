@@ -1,22 +1,22 @@
 '''
 VMP: Updated data. 
 Number of fixed traits. 
+VMP 2023-02-08: light cleanup
 '''
 
 # COGSCI23
 import pandas as pd 
 import numpy as np 
 import matplotlib.pyplot as plt 
-import seaborn as sns 
-from matplotlib.lines import Line2D
 import arviz as az
+import configuration as cn 
 
 # plotting setup
 small_text = 12
 large_text = 18
 
 # read data
-d_enforcement = pd.read_csv('../data/COGSCI23/enforcement_observed.csv')
+d_enforcement = pd.read_csv('../data/analysis/enforcement_observed.csv')
 d_enforcement['prob_remain'] = (1-d_enforcement['prob_move'])*100
 
 # we need the median as well
@@ -24,7 +24,7 @@ median_remain = d_enforcement.groupby('n_fixed_traits')['prob_remain'].median().
 
 # label some points 
 highlight_configs = [1027975, 652162]
-entry_maxlikelihood = pd.read_csv('../data/analysis/entry_maxlikelihood.csv')
+entry_maxlikelihood = pd.read_csv('../data/preprocessing/entry_maxlikelihood.csv')
 entry_maxlikelihood = entry_maxlikelihood[['config_id', 'entry_name']]
 entry_maxlikelihood = entry_maxlikelihood[entry_maxlikelihood['config_id'].isin(highlight_configs)]
 entry_sample = entry_maxlikelihood.groupby('config_id').sample(n=1, random_state = 1)
@@ -74,32 +74,19 @@ plt.ylabel(r'$\mathrm{P_{remain}}$', size = small_text)
 plt.savefig('../fig/pdf/enforcement_hdi.pdf', bbox_inches = 'tight')
 plt.savefig('../fig/svg/enforcement_hdi.svg', bbox_inches = 'tight')
 
-## what are the medians and HDI for different values? ## 
+# find medians and HDI intervals 
 hdi_df['median'] = median_remain
 
-# temporary #
-import pandas as pd 
-import numpy as np 
-import configuration as cn 
-from tqdm import tqdm 
-
 # load documents
-entry_maxlikelihood = pd.read_csv('../data/analysis/entry_maxlikelihood.csv')
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
-
-# generate all states
-n_nodes = 20
-from fun import bin_states 
-configurations = bin_states(n_nodes) 
+configuration_probabilities = np.loadtxt('../data/preprocessing/configuration_probabilities.txt')
+configurations = np.loadtxt('../data/preprocessing/configurations.txt', dtype = int)
+question_reference = pd.read_csv('../data/preprocessing/question_reference.csv')
 
 configuration = 652162
 conf = cn.Configuration(configuration,
                         configurations, 
                         configuration_probabilities)
-p_move = conf.p_move(configurations, 
-                        configuration_probabilities,
-                        summary = False)
+p_move = conf.p_move(summary = False)
 
 question_reference['p_move'] = p_move
 question_reference['held_belief'] = conf.configuration

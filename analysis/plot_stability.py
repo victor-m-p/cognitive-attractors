@@ -2,6 +2,7 @@
 VMP 2023-01-08: 
 updated and run on new parameter file.
 produces scatterplot of log(P(configuration)) x p(remain)
+VMP 2023-02-08: light refactoring, but should be cleaned properly. 
 '''
 
 import pandas as pd 
@@ -14,7 +15,7 @@ small_text = 12
 large_text = 18
 
 # import 
-stability = pd.read_csv('../data/COGSCI23/evo_stability/maxlik_evo_stability.csv')
+stability = pd.read_csv('../data/analysis/maxlik_evo_stability.csv')
 
 ## to log 
 stability['log_config_prob'] = np.log(stability['config_prob'])
@@ -60,7 +61,7 @@ annotations = annotations.drop_duplicates()
 
 ## now find the corresponding religions 
 pd.set_option('display.max_colwidth', None)
-entry_configuration = pd.read_csv('../data/analysis/entry_configuration_master.csv')
+entry_configuration = pd.read_csv('..../data/preprocessing/entry_configuration_master.csv')
 entry_configuration = entry_configuration[['config_id', 'entry_name']].drop_duplicates()
 entry_configuration = entry_configuration.groupby('config_id')['entry_name'].unique().reset_index(name = 'entry_name')
 annotations = entry_configuration.merge(annotations, on = 'config_id', how = 'inner')
@@ -188,7 +189,7 @@ stability['Landscape'] = np.select(conditions, results)
 stability = stability[['config_id', 'config_prob', 'Landscape']]
 
 ## 
-entry_maxlikelihood = pd.read_csv('../data/analysis/entry_maxlikelihood.csv')
+entry_maxlikelihood = pd.read_csv('..../data/preprocessing/entry_maxlikelihood.csv')
 entry_maxlikelihood = entry_maxlikelihood[['config_id', 'entry_name']]
 stability = stability.merge(entry_maxlikelihood, on = 'config_id', how = 'inner')
 
@@ -208,7 +209,6 @@ stability_latex = stability.to_latex(index=False)
 with open('../tables/landscape_types.txt', 'w') as f: 
     f.write(stability_latex)
 
-    
 ''' create overview table '''
 # helper function
 def community_weight(d, 
@@ -269,15 +269,10 @@ def subset_groups(df, sub_list, remap_dict):
 
 # ... 
 stability = stability[['Configuration', 'P(configuration)', 'Landscape']].drop_duplicates()
-
 import configuration as cn 
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
-
-# preprocessing 
-from fun import bin_states 
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
-n_nodes = 20
-configurations = bin_states(n_nodes) 
+question_reference = pd.read_csv('../data/preprocessing/question_reference.csv')
+configurations = np.loadtxt('..../data/preprocessing/configurations.txt', dtype = int)
+configuration_probabilities = np.loadtxt('..../data/preprocessing/configuration_probabilities.txt')
 
 ### each community against the others ### 
 n_groups = 4

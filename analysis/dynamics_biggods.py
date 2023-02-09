@@ -1,19 +1,17 @@
 '''
 Dynamics of monitoring and punishing Gods.
 Not (currently) used in the paper.
-VMP 2022-02-05: save as .svg and .pdf 
+VMP 2023-02-05: save as .svg and .pdf 
 '''
 
 import numpy as np 
 import matplotlib.pyplot as plt 
-from tqdm import tqdm 
-import pandas as pd 
 import networkx as nx 
 from fun import transition_probabilities
 
 # check the future warning 
-configurations = np.loadtxt('../data/analysis/configurations.txt')
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
+configurations = np.loadtxt('../data/preprocessing/configurations.txt')
+configuration_probabilities = np.loadtxt('../data/preprocessing/configuration_probabilities.txt')
 
 # setup 
 labels = ['MG, PG', '~MG, ~PG', 'MG, ~PG', '~MG, PG']

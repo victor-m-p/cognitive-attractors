@@ -1,7 +1,8 @@
 '''
 Prettified version of the attractor plot for the configuration
 inhabited by the Irish Catholics. 
-VMP 2022-02-05: save as .svg and .pdf 
+VMP 2022-03-05: save as .svg and .pdf 
+VMP 2022-03-08: light refactoring, but could still use work. 
 '''
 
 import networkx as nx             # graph manipulation
@@ -9,11 +10,9 @@ import numpy as np                # numerical utilities
 import matplotlib.pyplot as plt   # plotting
 import pandas as pd               # format results
 import re
-import os 
 np.random.seed(1)              # set seed for reproducibility
 import configuration as cn 
 from fun import * 
-from tqdm import tqdm 
 from unidecode import unidecode
 
 # https://www.color-hex.com/color-palette/68785
@@ -30,47 +29,44 @@ clrs_nodeedge = [
     '#a83619' # red
 ]
 
-entry_maxlikelihood = pd.read_csv('../data/analysis/entry_maxlikelihood.csv')
-entry_maxlikelihood = entry_maxlikelihood[['config_id', 'entry_name']]
+# read configurations and configuration probabilities
+configuration_probabilities = np.loadtxt('../data/preprocessing/configuration_probabilities.txt')
+configurations = np.loadtxt('../data/preprocessing/configurations.txt', dtype = int)
 
-#entry_maxlikelihood = entry_maxlikelihood.groupby('config_id').sample(n=1, random_state=1)
+# read data and clean string with entry name 
+entry_maxlikelihood = pd.read_csv('../data/preprocessing/entry_maxlikelihood.csv')
+entry_maxlikelihood = entry_maxlikelihood[['config_id', 'entry_name']]
 entry_maxlikelihood['entry_name'] = [re.sub(r"(\(.*\))|(\[.*\])", "", x) for x in entry_maxlikelihood['entry_name']]
 entry_maxlikelihood['entry_name'] = [re.sub(r"\/", " ", x) for x in entry_maxlikelihood['entry_name']]
 entry_maxlikelihood['entry_name'] = [unidecode(text).strip() for text in entry_maxlikelihood['entry_name']]
 
+# read the maximum likelihood path for the Irish Catholic configuration
 config_orig = 1017606
-d = pd.read_csv(f'../data/COGSCI23/attractors/t0.5_max5000_idx{config_orig}.csv')
+d = pd.read_csv(f'../data/analysis/attractors/t0.5_max5000_idx{config_orig}.csv')
 d = d[['config_from', 'config_to', 'probability']].drop_duplicates()
 
-# get probability for each state for vertical axis 
+# configuration probs 
 config_from = d['config_from'].unique().tolist()
 config_to = d['config_to'].unique().tolist()
 config_uniq = list(set(config_from + config_to))
-
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
 p = configuration_probabilities[config_uniq]
 config_probs = pd.DataFrame({
     'config_id': config_uniq,
     'config_prob': p
 })
-
 config_probs['log_config_prob'] = [np.log(x) for x in config_probs['config_prob']]
 
-## node size by hamming? ## 
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
-n_nodes = 20
-configurations = bin_states(n_nodes) 
+# scale nodesize by hamming distance from starting configuration (Irish Catholics)
 ConfOrig = cn.Configuration(config_orig,
                             configurations,
                             configuration_probabilities)
 hamming_distances = []
 for i in config_uniq: 
     ConfOther = cn.Configuration(i,
-                                configurations,
-                                configuration_probabilities)
+                                 configurations,
+                                 configuration_probabilities)
     distance = ConfOrig.hamming_distance(ConfOther)
     hamming_distances.append((i, distance))
-
 hamming_distances = pd.DataFrame(hamming_distances,
                                 columns = ['config_id', 'hamming'])
 
@@ -79,8 +75,6 @@ attractors = list(set(config_to) - set(config_from))
 unique_config_df = pd.DataFrame({'config_id': config_uniq})
 node_attributes = unique_config_df.merge(entry_maxlikelihood, on = 'config_id', how = 'left').fillna("")
 node_attributes.sort_values('config_id')
-
-node_attributes
 
 # decide on specific labels to include 
 entry_names = [(362246, 'Valentinians'),
@@ -112,7 +106,7 @@ node_attributes['nodeedge_color'] = [clrs_nodeedge[3] if x in attractors else y 
 source = node_attributes[node_attributes['config_id'] == config_orig]['entry_name'].tolist()[0]
 
 # add data
-naive_path = pd.read_csv(f'../data/COGSCI23/max_attractor/idx{config_orig}.csv')
+naive_path = pd.read_csv(f'../data/analysis/max_attractor/idx{config_orig}.csv')
 naive_path = naive_path[['config_from', 'config_to']]
 naive_path['edge_color'] = 'k'
 d = d.merge(naive_path, on = ['config_from', 'config_to'], how = 'left').fillna('tab:grey')
@@ -135,7 +129,6 @@ for _, row in node_attr.iterrows():
     G.nodes[config_id]['hamming'] = row['hamming']
     G.nodes[config_id]['entry_name'] = row['entry_name']
     
-
 # get node attributes out 
 pos = {}
 nodelist = []
@@ -224,8 +217,8 @@ source = re.sub(" ", "_", source)
 plt.savefig(f'../fig/pdf/{source}_{config_orig}.pdf', bbox_inches = 'tight')
 plt.savefig(f'../fig/svg/{source}_{config_orig}.svg', bbox_inches = 'tight')
 
-# What bit-flips trace the paths? # 
-question_reference = pd.read_csv('../data/analysis/question_reference.csv')
+# What bit-flips trace the paths? 
+question_reference = pd.read_csv('..../data/preprocessing/question_reference.csv')
 
 bit_flip_list = []
 for index, row in d.iterrows(): 

@@ -1,31 +1,23 @@
-# COGSCI23
+# VMP 2023-02-08: refactored and re-run. 
 include("configuration.jl")
 using .cn, Printf, Statistics, Distributions, DelimitedFiles, CSV, DataFrames, IterTools, StatsBase, Chain, FStrings
 
-# load shit 
-configuration_probabilities = readdlm("/home/vpoulsen/cognitive-attractors/data/analysis/configuration_probabilities.txt")
-configurations = readdlm("/home/vpoulsen/cognitive-attractors/data/analysis/configurations.txt", Int)
+# manage paths 
+dir = @__DIR__
+path_configuration_probabilities = replace(dir, "analysis" => "data/preprocessing/configuration_probabilities.txt")
+path_configurations = replace(dir, "analysis" => "data/preprocessing/configurations.txt")
+path_entry_config = replace(dir, "analysis" => "data/preprocessing/entry_maxlikelihood.csv")
 
-## I need an array, rather than a matrix 
+# read configurations 
+configuration_probabilities = readdlm(path_configuration_probabilities)
+configurations = readdlm(path_configurations, Int)
 configurations = cn.slicematrix(configurations)
 
 # load all maximum likelihood configurations 
-entry_config_filename = "/home/vpoulsen/cognitive-attractors/data/analysis/entry_maxlikelihood.csv"
-entry_maxlikelihood = DataFrame(CSV.File(entry_config_filename))
+entry_maxlikelihood = DataFrame(CSV.File(path_entry_config))
 config_ids = @chain entry_maxlikelihood begin _.config_id end
 unique_configs = unique(config_ids) # think right, but double check 
 unique_configs = unique_configs .+ 1 # because of 0-indexing in python 
-
-# find id of neighbors
-function get_neighbor_idx(configuration, indices, configurations)
-    neighbor_idx_above_threshold = []
-    for i in indices
-        flip = configuration.flip_index(i)
-        flipid = findfirst(isequal(flip), configurations)
-        append!(neighbor_idx_above_threshold, flipid)
-    end 
-    return neighbor_idx_above_threshold 
-end 
 
 # setup
 max_rows = 5000
@@ -57,10 +49,10 @@ for original_idx in unique_configs
                 _, p_move, indices, values, neighbor_idx_list = conf_list[exists]
             else 
                 ConfObj = cn.Configuration(focal_idx, configurations, configuration_probabilities)
-                p_move = ConfObj.p_move(configurations, configuration_probabilities, false)
+                p_move = ConfObj.p_move(false)
                 indices = findall(>(threshold), p_move)
                 values = p_move[indices]
-                neighbor_idx_list = get_neighbor_idx(ConfObj, indices, configurations)
+                neighbor_idx_list = ConfObj.neighbor_id(indices)
                 push!(conf_list, [focal_idx, p_move, indices, values, neighbor_idx_list])
             end 
             if length(indices) != 0
@@ -82,5 +74,6 @@ for original_idx in unique_configs
     end 
     end 
     original_idx = original_idx .- 1
-    CSV.write(f"/home/vpoulsen/cognitive-attractors/data/COGSCI23/attractors/t{threshold}_max{max_rows}_idx{original_idx}.csv", df)
+    outpath = replace(dir, "analysis" => f"data/analysis/attractors/t{threshold}_max{max_rows}_idx{original_idx}_tst.csv")
+    CSV.write(outpath, df)
 end 

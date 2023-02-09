@@ -1,7 +1,7 @@
 '''
 Dynamics of child- and adult sacrifice.
 Not (currently) used in the paper.
-VMP 2022-02-05: save as .svg and .pdf 
+VMP 2023-02-05: save as .svg and .pdf 
 '''
 
 import numpy as np 
@@ -12,8 +12,8 @@ import networkx as nx
 from fun import transition_probabilities
 
 # check the future warning 
-configurations = np.loadtxt('../data/analysis/configurations.txt')
-configuration_probabilities = np.loadtxt('../data/analysis/configuration_probabilities.txt')
+configurations = np.loadtxt('../data/preprocessing/configurations.txt')
+configuration_probabilities = np.loadtxt('../data/preprocessing/configuration_probabilities.txt')
 
 # setup 
 labels = ['AS, CS', '~AS, ~CS', 'AS, ~CS', '~AS, CS']
@@ -103,7 +103,7 @@ plt.savefig(f'../fig/svg/sacrifice_transitions_{n_samples}.svg')
 
 # specifically spartan 
 ## only the maximum likelihood configuration
-spartans = pd.read_csv('../data/analysis/entry_maxlikelihood.csv')
+spartans = pd.read_csv('..../data/preprocessing/entry_maxlikelihood.csv')
 spartans = spartans[spartans['entry_name'].str.contains('Archaic Spartan')]
 spartan_idx = spartans['config_id'].tolist()
 spartan_conf = configurations[spartan_idx]
