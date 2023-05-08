@@ -248,3 +248,4 @@ def transition_probabilities(configurations, configuration_probabilities,
     df = pd.DataFrame(x, columns = ['type_from', 'type_to', 'probability'])
     df = df.groupby(['type_from', 'type_to'])['probability'].mean().reset_index(name = 'probability')
     return df 
+    

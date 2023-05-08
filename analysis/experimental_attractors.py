@@ -8,7 +8,7 @@ import numpy as np
 import os 
 import re
 
-path = '../data/analysis/max_attractor'
+path = '../data/analysis/max_attractor' # from analytical max 
 files = os.listdir(path)
 
 ## only consider the end attractor
@@ -30,8 +30,21 @@ termination_sum = termination_df.groupby('attractor').size().reset_index(name = 
 termination_sum = termination_sum.sort_values('count', ascending = False)
 
 # get all maximum likelihood configurations in here
-entry_maxlikelihood = pd.read_csv('..../data/preprocessing/entry_maxlikelihood.csv')
+entry_maxlikelihood = pd.read_csv('../data/preprocessing/entry_maxlikelihood.csv')
 termination_sum = termination_sum.rename(columns = {'attractor': 'config_id'})
+
+''' conclusion: we are excluding those that terminate at non-maximum-likelihood observed configurations. 
+# wait; so what are we missing here?
+# should sum to 260 so this is weird ...
+# can we backtrack this? 
+termination_entries = termination_sum.merge(entry_maxlikelihood, on = 'config_id', how = 'left', indicator=True)
+termination_entries # e.g. 385542
+termination_df[termination_df['attractor'] == 385542]
+
+
+entry_maxlikelihood[entry_maxlikelihood['config_id'] == 508422]
+entry_maxlikelihood[entry_maxlikelihood['config_id'] == 376838]
+'''
 
 # merge
 termination_entries = entry_maxlikelihood.merge(termination_sum, on = 'config_id', how = 'inner')

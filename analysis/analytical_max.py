@@ -4,6 +4,8 @@ VMP 2023-02-07: Refactored from original code.
 VMP 2023-02-07: Re-run with refactored code. 
 '''
 
+83+42+29+26+17+11+10+9+8+7+2 # 244 
+
 # import packages
 import pandas as pd 
 import numpy as np 
