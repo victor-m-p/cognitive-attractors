@@ -1,6 +1,7 @@
 '''
 VMP 2023-05-08: 
-checking the raw values for the big gods data.
+Checking the raw values for the big gods data.
+We will not be using this in the paper anyways. 
 '''
 
 import numpy as np 
