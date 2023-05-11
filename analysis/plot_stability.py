@@ -61,7 +61,7 @@ annotations = annotations.drop_duplicates()
 
 ## now find the corresponding religions 
 pd.set_option('display.max_colwidth', None)
-entry_configuration = pd.read_csv('..../data/preprocessing/entry_configuration_master.csv')
+entry_configuration = pd.read_csv('../data/preprocessing/entry_configuration_master.csv')
 entry_configuration = entry_configuration[['config_id', 'entry_name']].drop_duplicates()
 entry_configuration = entry_configuration.groupby('config_id')['entry_name'].unique().reset_index(name = 'entry_name')
 annotations = entry_configuration.merge(annotations, on = 'config_id', how = 'inner')
@@ -116,10 +116,11 @@ sns.scatterplot(data = stability,
                 y = 'remain_prob',
                 c = stability['color'].values)
 sns.regplot(data = stability,
-           x = 'log_config_prob',
-           y = 'remain_prob',
-           scatter = False, 
-           color = 'tab:red')
+            x = 'log_config_prob',
+            y = 'remain_prob',
+            scatter = False, 
+            ci = None,
+            color = 'tab:red')
 ## the annotations 
 plt.axvline(x = median_config,
            ymin = 0,
@@ -146,13 +147,22 @@ for _, row in annotations.iterrows():
                     horizontalalignment = 'left',
                     verticalalignment = 'center')
 plt.xlabel(r'$\mathrm{log} \; \mathrm{P(i)}$', size = small_text)
-plt.ylabel(r'$\mathrm{P_{remain}}$', size = small_text)
+plt.ylabel(r'$\mathrm{P(i \rightarrow i)}$', size = small_text)
 plt.xlim(-14, -3.6)
 ## save figure 
 plt.savefig('../fig/pdf/local_global_stability.pdf', bbox_inches = 'tight')
 plt.savefig('../fig/svg/local_global_stability.svg', bbox_inches = 'tight')
 
-''' create groups in the data '''
+# TMP
+bottom_25_config = stability['config_prob'].quantile(0.5)
+top_25_remain = stability['remain_prob'].quantile(0.75)
+stability['bottom_config'] = np.where(stability['config_prob'] < bottom_25_config, 1, 0)
+stability['top_remain'] = np.where(stability['remain_prob'] > top_25_remain, 1, 0)
+bottom_top = stability[(stability['bottom_config'] == 1) & (stability['top_remain'] == 1)]
+bottom_quartile = stability[stability['bottom_config'] == 1]
+len(bottom_top) / len(bottom_quartile)
+
+''' below computes characteristics for the four quadrants: not used in paper '''
 
 ## regression line  
 from sklearn.linear_model import LinearRegression

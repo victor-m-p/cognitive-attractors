@@ -60,17 +60,17 @@ for i in indexes:
 # first where we take base-probability into account
 stability_idx_norm = []
 for i in indexes: 
-    p = matched_p_lst[i]
-    rowsum = np.sum(p, axis=1)
-    marginal = np.sum(rowsum * np.abs(np.log(p[:, 0] / p[:, 1])))
+    pi = matched_p_lst[i]
+    rowsum = np.sum(pi, axis=1)
+    marginal = np.sum(rowsum * np.abs(np.log(pi[:, 0] / pi[:, 1])))
     stability_idx_norm.append(marginal)
 stability_idx_norm = np.array(stability_idx_norm)
 
 # then when we do not take base-rate probability into account
 stability_idx_raw = []
 for i in indexes:
-    p = matched_p_lst[i]
-    rowsum = np.sum(np.abs(np.log(p[:, 0] / p[:, 1])))
+    pi = matched_p_lst[i]
+    rowsum = np.sum(np.abs(np.log(pi[:, 0] / pi[:, 1])))
     stability_idx_raw.append(rowsum)
 
 stability_idx_raw = np.array(stability_idx_raw)/2**19
@@ -85,15 +85,16 @@ d_stability_norm = pd.DataFrame({
     'stability_idx': stability_idx_norm
 })
 d_stability_norm = d_stability_norm.sort_values('stability_idx', ascending = False).reset_index()
-fig, ax = plt.subplots(dpi=300)
+fig, ax = plt.subplots(figsize=(5, 6.5), dpi=300)
 plt.barh(d_stability_norm.index, d_stability_norm['stability_idx'])
-plt.yticks(d_stability_norm.index, d_stability_norm['question'])
-plt.xlabel(r'stability index: $\sum_{c \in C} P(c) \; | \; log \; \frac{p(\sigma = -1|c)}{p(\sigma = +1|c)} \;|$')
+plt.yticks(d_stability_norm.index, d_stability_norm['question'],
+           size=15)
+plt.xlabel(r'$\mathrm{rigidity(\sigma_i) = \sum_{c \in C} P(c) \; | \; log \; \frac{p(\sigma_i = -1|c)}{p(\sigma_i = +1|c)} \;|}$',
+           size=15)
+plt.savefig('../fig/pdf/rigidity_idx_normalized.pdf', bbox_inches = 'tight')
+plt.savefig('../fig/svg/rigidity_idx_normalized.svg', bbox_inches = 'tight')
 
-plt.savefig('../fig/pdf/stability_idx_normalized.pdf', bbox_inches = 'tight')
-plt.savefig('../fig/svg/stability_idx_normalized.svg', bbox_inches = 'tight')
-
-# for the non-normalized data
+# for the non-normalized data (notice that labels are wrong from here on out; old convention)
 d_stability_raw = pd.DataFrame({
     'question': questions_shorthand,
     'stability_idx': stability_idx_raw
@@ -105,15 +106,15 @@ plt.yticks(d_stability_raw.index, d_stability_raw['question'])
 plt.xlabel(r'stability index: $\frac{1}{|C|} \sum_{c \in C} | \; log \; \frac{p(\sigma = -1|c)}{p(\sigma = +1|c)} \;|$')
 plt.suptitle('Stability Index')
 
-# plot a distribution for fun;
-import seaborn as sns 
-question_reference
-belief_afterlife = matched_p_lst[4]
-sns.distplot(np.abs(np.log(belief_afterlife[:, 0] / belief_afterlife[:, 1])))
+# is it e**number: 
+# does not seem like it for child sacrifice, unclear. 
+x = matched_p_lst[16]
+y = x[:, 0] / x[:, 1] # seems like in the 10-20, 0.1-0.2 range...
+2.71**5 # 146 ....?
 
-fig, ax = plt.subplots()
-belief_pc = np.mean(belief_afterlife, axis = 1)
-belief_norm = belief_pc * np.abs(np.log(belief_afterlife[:, 0] / belief_afterlife[:, 1]))
-belief_norm.min()
-belief_norm.max()
-sns.distplot(belief_norm)
+# temporary; 
+# what is the base-rate for reincarnation in this world?
+idx_reincarnation = 5
+config_idx_reincarnation = np.where(config[:, idx_reincarnation] == 1)
+p_reincarnation = p[config_idx_reincarnation]
+p_reincarnation = np.sum(p_reincarnation)
